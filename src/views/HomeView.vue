@@ -127,36 +127,20 @@ const sendPicture = async () => {
     "caption",
     `📩 Yangi nomzod mavjud
 
-📍Ismi: ${fullName}
+🔠Ismi: ${fullName}
 
-📍Yoshi: ${age}
+🔢Yoshi: ${age} da
 
 📍Manzili: ${address}
 
-📍Telefon: ${cleanPhone}
+☎️Telefon: ${cleanPhone}
 
-📍Tugallagan o'quv dargohlari: ${whereDidYouStudy}
+🎓Tugallagan o'quv dargohlari: ${whereDidYouStudy}
 
-📍Ishlagan joylari va malakasi: ${whereDidYouWork}
+🏢Ishlagan joylari va malakasi: ${whereDidYouWork}
 
-📍Ushbu vacansiya uchun: ${vacancy}
+✅Ushbu vacansiya uchun: ${vacancy}
   `
-  );
-  formData.append(
-    "reply_markup",
-    JSON.stringify({
-      inline_keyboard: [
-        [
-          {
-            text: "Qabul qilish",
-            callback_data: JSON.stringify({
-              com: "test",
-              id: "testid",
-            }),
-          },
-        ],
-      ],
-    })
   );
 
   try {
@@ -176,6 +160,7 @@ const sendPicture = async () => {
     tg.close();
   }
 };
+
 const showButton = () => {
   const { fullName, age, address, phone, vacancy } = myForm.value;
   if (fullName && age && address && phone && vacancy && file.value) {
