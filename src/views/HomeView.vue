@@ -163,12 +163,12 @@ const sendPicture = async () => {
 const showButton = () => {
   const { fullName, age, address, phone, studyOrWork, vacancy } = myForm.value;
   if (
-    fullName &&
-    age &&
-    address &&
-    phone &&
-    studyOrWork &&
-    vacancy &&
+    myForm.fullName &&
+    myForm.age &&
+    myForm.address &&
+    myForm.phone &&
+    myForm.studyOrWork &&
+    myForm.vacancy &&
     file.value
   ) {
     tg.MainButton.show();
