@@ -18,17 +18,38 @@
         @change="handleFileUpload"
       />
     </div>
-    <form @submit.prevent>
+    <form @submit.prevent :model="myForm">
       <label for="fullName">Full name</label>
-      <input type="text" id="fullName" />
+      <input type="text" id="fullName" v-model="myForm.fullName" />
       <label for="age">Age</label>
-      <input type="number" id="age" />
+      <input type="number" id="age" v-model="myForm.age" />
       <label for="phoneNumber">Phone number</label>
-      <input type="text" id="phoneNumber" />
-      <label for="address">Address</label>
-      <input type="text" id="address" />
-      <label for="description">Description</label>
-      <textarea name="description" id="description"></textarea>
+      <input type="tel" id="phoneNumber" v-model="myForm.phoneNumber" />
+      <label for="address">address</label>
+      <textarea name="address" id="address" v-model="myForm.address"></textarea>
+      <label for="whereDidYouStudy">whereDidYouStudy</label>
+      <textarea
+        name="whereDidYouStudy"
+        id="whereDidYouStudy"
+        v-model="myForm.whereDidYouStudy"
+      ></textarea>
+      <label for="whereDidYouWork">whereDidYouWork</label>
+      <textarea
+        name="whereDidYouWork"
+        id="whereDidYouWork"
+        v-model="myForm.whereDidYouWork"
+      ></textarea>
+      <label for="for">Qaysivacansiya uchun</label>
+      <select
+        v-model="myForm.for"
+        name="for"
+        id="for"
+        class="select"
+        placeholder="Qaysi vakansiya uchunligini tanlang"
+      >
+        <option value="fer">Royal Taxi</option>
+        <option value="tosh">Aptekalar tarmog'i (farmaseftika)</option>
+      </select>
     </form>
   </div>
 </template>
@@ -37,12 +58,27 @@
 import axios from "axios";
 import { ref, watchEffect } from "vue";
 const tg = window.Telegram.WebApp;
+const BOT_TOKEN = "7050630309:AAEqP-6OzBc5Tc-b5AiY_EI3j_lpeb8SRWY";
+// const CHAT_ID = "7181292313"; // utkir 3
+const CHAT_ID = "177482674"; // utkir 1
 
 const file = ref("");
 const fileURL = ref("");
-const BOT_TOKEN = "6302856184:AAFr7Wan3KQJlg0d3DLiCZZ6keAuT6zZU98";
-const CHAT_ID = "7181292313"; // utkir 3
-// const CHAT_ID = "177482674"; // utkir 1
+const myForm = ref({
+  fullName: "",
+  age: "",
+  address: "",
+  whereDidYouStudy: "",
+  whereDidYouWork: "",
+  phone: "",
+  photo: "",
+  academicDegree: "",
+  studyOrWork: "",
+  documentPath: "",
+  status: "",
+  vacancy: "",
+  chatId: "",
+});
 
 const handleFileUpload = (event) => {
   const selectedFile = event.target.files[0];
@@ -67,12 +103,21 @@ const sendPicture = async () => {
   formData.append(
     "caption",
     `	📩 Haydovchi malumotlari
-  
-  📍Ismi: Utkirbek
-  
-  📍Mashina raqami: 40 N 451 PA
-  
-  🚕Mashina turi: Matiz`
+
+  📍Ismi: ${myForm.fullName}
+
+  📍Yoshi: ${myForm.age}
+
+  📍Manzili: ${myForm.address}
+
+  📍Telefon: ${myForm.phone}
+
+  📍Tugallagan o'quv dargohlari: ${myForm.whereDidYouStudy}
+
+  📍Ishlagan joylari va malakasi: ${myForm.whereDidYouWork}
+
+  📍Ushbu vacansiya uchun: ${myForm.vacancy}
+  `
   );
   formData.append(
     "reply_markup",
@@ -109,12 +154,22 @@ const sendPicture = async () => {
   }
 };
 const showButton = () => {
-  if (file.value) {
+  const { fullName, age, address, phone, studyOrWork, vacancy } = myForm;
+  if (
+    fullName &&
+    age &&
+    address &&
+    phone &&
+    studyOrWork &&
+    vacancy &&
+    file.value
+  ) {
     tg.MainButton.show();
   } else {
     tg.MainButton.hide();
   }
 };
+
 watchEffect(() => {
   showButton();
   tg.MainButton.setParams({
