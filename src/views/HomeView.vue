@@ -23,11 +23,11 @@
       <input type="text" id="fullName" v-model="myForm.fullName" />
       <label for="age">Age</label>
       <input type="number" id="age" v-model="myForm.age" />
-      <label for="phoneNumber">Phone number</label>
+      <label for="phone">Phone number</label>
       <input
         type="tel"
-        id="phoneNumber"
-        v-model="myForm.phoneNumber"
+        id="phone"
+        v-model="myForm.phone"
         v-maska
         data-maska="+998 ## ### ## ##"
       />
@@ -161,16 +161,8 @@ const sendPicture = async () => {
   }
 };
 const showButton = () => {
-  const { fullName, age, address, phone, studyOrWork, vacancy } = myForm.value;
-  if (
-    fullName &&
-    age &&
-    address &&
-    phone &&
-    studyOrWork &&
-    vacancy &&
-    file.value
-  ) {
+  const { fullName, age, address, phone, vacancy } = myForm.value;
+  if (fullName && age && address && phone && vacancy && file.value) {
     tg.MainButton.show();
   } else {
     tg.MainButton.hide();
