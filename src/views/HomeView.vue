@@ -111,7 +111,7 @@ const sendPicture = async () => {
     "caption",
     `	📩 Yangi nomzod mavjud
 
-  📍Ismi: ${myForm.fullName}
+  📍Ismi: ${myForm.value.fullName}
 
   📍Yoshi: ${myForm.age}
 
