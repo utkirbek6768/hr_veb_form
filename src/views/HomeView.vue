@@ -159,7 +159,7 @@ const sendPicture = async () => {
         },
       }
     );
-    tg.sendData(JSON.stringify(res.data.result));
+    tg.sendData(JSON.stringify(res.data.result, myForm));
   } catch (error) {
     console.error("Error sending picture:", error);
   } finally {
