@@ -66,26 +66,28 @@ import { ref, watchEffect } from "vue";
 import { vMaska } from "maska";
 const tg = window.Telegram.WebApp;
 const BOT_TOKEN = "7050630309:AAEqP-6OzBc5Tc-b5AiY_EI3j_lpeb8SRWY";
-// const CHAT_ID = "7181292313"; // utkir 3
 const CHAT_ID = "177482674"; // utkir 1
+// const CHAT_ID = "7181292313"; // utkir 3
 
-const file = ref("");
-const fileURL = ref("");
-const myForm = ref({
-  fullName: "",
-  age: "",
-  address: "",
-  whereDidYouStudy: "",
-  whereDidYouWork: "",
-  phone: "+998 ",
-  photo: "",
-  academicDegree: "",
-  studyOrWork: "",
-  documentPath: "",
-  status: "",
-  vacancy: "",
-  chatId: "",
-});
+const state = {
+  file: ref(""),
+  fileURL: ref(""),
+  myForm: ref({
+    fullName: "",
+    age: "",
+    address: "",
+    whereDidYouStudy: "",
+    whereDidYouWork: "",
+    phone: "+998 ",
+    photo: "",
+    academicDegree: "",
+    studyOrWork: "",
+    documentPath: "",
+    status: "",
+    vacancy: "",
+    chatId: "",
+  }),
+};
 
 const handleFileUpload = (event) => {
   const selectedFile = event.target.files[0];
@@ -93,20 +95,34 @@ const handleFileUpload = (event) => {
 
   const reader = new FileReader();
   reader.onload = (e) => {
-    file.value = selectedFile;
-    fileURL.value = e.target.result;
+    state.file.value = selectedFile;
+    state.fileURL.value = e.target.result;
   };
   reader.readAsDataURL(selectedFile);
 };
 
+const isFormComplete = () => {
+  const { fullName, age, address, phone, studyOrWork, vacancy } =
+    state.myForm.value;
+  return (
+    fullName &&
+    age &&
+    address &&
+    phone &&
+    studyOrWork &&
+    vacancy &&
+    state.file.value
+  );
+};
+
 const sendPicture = async () => {
-  if (file.value === "") {
-    alert("Error");
+  if (!isFormComplete()) {
+    alert("Error: Form is incomplete.");
     return;
   }
 
   const formData = new FormData();
-  formData.append("photo", file.value);
+  formData.append("photo", state.file.value);
   formData.append(
     "caption",
     `	📩 Haydovchi malumotlari
@@ -155,21 +171,23 @@ const sendPicture = async () => {
     );
     tg.sendData(JSON.stringify(res.data.result));
   } catch (error) {
-    console.error("Error sending picture:", error);
+    console.error("Error sending picture:", error.message);
   } finally {
     tg.close();
   }
 };
+
 const showButton = () => {
-  const { fullName, age, address, phone, studyOrWork, vacancy } = myForm.value;
+  const { fullName, age, address, phone, studyOrWork, vacancy } =
+    state.myForm.value;
   if (
-    myForm.value.fullName &&
-    myForm.value.age &&
-    myForm.value.address &&
-    myForm.value.phone &&
-    myForm.value.studyOrWork &&
-    myForm.value.vacancy &&
-    file.value
+    fullName &&
+    age &&
+    address &&
+    phone &&
+    studyOrWork &&
+    vacancy &&
+    state.file.value
   ) {
     tg.MainButton.show();
   } else {
