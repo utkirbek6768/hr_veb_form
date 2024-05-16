@@ -21,6 +21,7 @@
     <form @submit.prevent :model="myForm">
       <label for="fullName">Full name</label>
       <input type="text" id="fullName" v-model="myForm.fullName" />
+
       <label for="age">Age</label>
       <input
         v-maska
@@ -29,6 +30,7 @@
         id="age"
         v-model="myForm.age"
       />
+
       <label for="phone">Phone number</label>
       <input
         type="tel"
@@ -37,20 +39,24 @@
         v-maska
         data-maska="+998 ## ### ## ##"
       />
+
       <label for="address">address</label>
-      <textarea name="address" id="address" v-model="myForm.address"></textarea>
+      <input type="text" name="address" id="address" v-model="myForm.address" />
+
       <label for="whereDidYouStudy">whereDidYouStudy</label>
       <textarea
         name="whereDidYouStudy"
         id="whereDidYouStudy"
         v-model="myForm.whereDidYouStudy"
       ></textarea>
+
       <label for="whereDidYouWork">whereDidYouWork</label>
       <textarea
         name="whereDidYouWork"
         id="whereDidYouWork"
         v-model="myForm.whereDidYouWork"
       ></textarea>
+
       <label for="for">Qaysivacansiya uchun</label>
       <select
         v-model="myForm.vacancy"
