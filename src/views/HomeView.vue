@@ -100,6 +100,15 @@ const handleFileUpload = (event) => {
 };
 
 const sendPicture = async () => {
+  const {
+    fullName,
+    age,
+    address,
+    phone,
+    vacancy,
+    whereDidYouStudy,
+    whereDidYouWork,
+  } = myForm.value;
   if (file.value === "") {
     alert("Error");
     return;
@@ -111,19 +120,19 @@ const sendPicture = async () => {
     "caption",
     `	📩 Yangi nomzod mavjud
 
-  📍Ismi: ${myForm.value.fullName}
+  📍Ismi: ${fullName}
 
-  📍Yoshi: ${myForm.age}
+  📍Yoshi: ${age}
 
-  📍Manzili: ${myForm.address}
+  📍Manzili: ${address}
 
-  📍Telefon: ${myForm.phone}
+  📍Telefon: ${phone}
 
-  📍Tugallagan o'quv dargohlari: ${myForm.whereDidYouStudy}
+  📍Tugallagan o'quv dargohlari: ${whereDidYouStudy}
 
-  📍Ishlagan joylari va malakasi: ${myForm.whereDidYouWork}
+  📍Ishlagan joylari va malakasi: ${whereDidYouWork}
 
-  📍Ushbu vacansiya uchun: ${myForm.vacancy}
+  📍Ushbu vacansiya uchun: ${vacancy}
   `
   );
   formData.append(
