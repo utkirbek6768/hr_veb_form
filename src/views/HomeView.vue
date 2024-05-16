@@ -4,12 +4,13 @@
       <h1>Form title</h1>
       <div class="avatar">
         <img class="image" v-if="fileURL !== ''" :src="fileURL" alt="" />
-        <label v-else class="imageLabel" for="image"
-          ><img
+        <label v-else class="imageLabel" for="image">
+          <img
             class="image"
             src="https://t4.ftcdn.net/jpg/05/69/90/73/360_F_569907313_fl7W3gX7YIVw2r05B4Ij1c21ix4xRUqD.jpg"
             alt="Default avatar image"
-        /></label>
+          />
+        </label>
       </div>
       <input
         style="display: none"
@@ -53,8 +54,8 @@
         class="select"
         placeholder="Qaysi vakansiya uchunligini tanlang"
       >
-        <option value="fer">Royal Taxi</option>
-        <option value="tosh">Aptekalar tarmog'i (farmaseftika)</option>
+        <option value="taxi">Royal Taxi</option>
+        <option value="farm">Aptekalar tarmog'i (farmaseftika)</option>
       </select>
     </form>
   </div>
@@ -62,12 +63,12 @@
 
 <script setup>
 import axios from "axios";
-import { ref, watchEffect } from "vue";
+import { ref, watch } from "vue";
 import { vMaska } from "maska";
+
 const tg = window.Telegram.WebApp;
 const BOT_TOKEN = "7050630309:AAEqP-6OzBc5Tc-b5AiY_EI3j_lpeb8SRWY";
-// const CHAT_ID = "7181292313"; // utkir 3
-const CHAT_ID = "177482674"; // utkir 1
+const CHAT_ID = "177482674";
 
 const file = ref("");
 const fileURL = ref("");
@@ -77,7 +78,7 @@ const myForm = ref({
   address: "",
   whereDidYouStudy: "",
   whereDidYouWork: "",
-  phone: "",
+  phone: "+998 ",
   photo: "",
   academicDegree: "",
   studyOrWork: "",
@@ -99,49 +100,22 @@ const handleFileUpload = (event) => {
   reader.readAsDataURL(selectedFile);
 };
 
+const isFormComplete = () => {
+  const { fullName, age, address, phone, studyOrWork, vacancy } = myForm.value;
+  return (
+    fullName && age && address && phone && studyOrWork && vacancy && file.value
+  );
+};
+
 const sendPicture = async () => {
-  if (file.value === "") {
-    alert("Error");
+  if (!isFormComplete()) {
+    alert("Error: Form is incomplete.");
     return;
   }
 
   const formData = new FormData();
   formData.append("photo", file.value);
-  formData.append(
-    "caption",
-    `	📩 Haydovchi malumotlari
-
-  📍Ismi: ${myForm.fullName}
-
-  📍Yoshi: ${myForm.age}
-
-  📍Manzili: ${myForm.address}
-
-  📍Telefon: ${myForm.phone}
-
-  📍Tugallagan o'quv dargohlari: ${myForm.whereDidYouStudy}
-
-  📍Ishlagan joylari va malakasi: ${myForm.whereDidYouWork}
-
-  📍Ushbu vacansiya uchun: ${myForm.vacancy}
-  `
-  );
-  formData.append(
-    "reply_markup",
-    JSON.stringify({
-      inline_keyboard: [
-        [
-          {
-            text: "Qabul qilish",
-            callback_data: JSON.stringify({
-              com: "test",
-              id: "testid",
-            }),
-          },
-        ],
-      ],
-    })
-  );
+  // Add other form data here
 
   try {
     const res = await axios.post(
@@ -160,24 +134,17 @@ const sendPicture = async () => {
     tg.close();
   }
 };
+
 const showButton = () => {
-  const { fullName, age, address, phone, studyOrWork, vacancy } = myForm;
-  if (
-    fullName &&
-    age &&
-    address &&
-    phone &&
-    studyOrWork &&
-    vacancy &&
-    file.value
-  ) {
+  if (isFormComplete()) {
     tg.MainButton.show();
   } else {
     tg.MainButton.hide();
   }
 };
 
-watchEffect(() => {
+// Watch for changes in form fields and update button visibility
+const formWatcher = () => {
   showButton();
   tg.MainButton.setParams({
     text: "Tayyor",
@@ -185,7 +152,21 @@ watchEffect(() => {
   tg.expand();
   tg.ready();
   tg.onEvent("mainButtonClicked", sendPicture);
-});
+};
+
+// Watch for changes in form fields
+watch(
+  () => [
+    myForm.value.fullName,
+    myForm.value.age,
+    myForm.value.address,
+    myForm.value.phone,
+    myForm.value.studyOrWork,
+    myForm.value.vacancy,
+    file.value,
+  ],
+  formWatcher
+);
 </script>
 
 <style>
