@@ -22,7 +22,13 @@
       <label for="fullName">Full name</label>
       <input type="text" id="fullName" v-model="myForm.fullName" />
       <label for="age">Age</label>
-      <input type="number" id="age" v-model="myForm.age" />
+      <input
+        v-maska
+        data-maska="##"
+        type="number"
+        id="age"
+        v-model="myForm.age"
+      />
       <label for="phone">Phone number</label>
       <input
         type="tel"
@@ -109,6 +115,7 @@ const sendPicture = async () => {
     whereDidYouStudy,
     whereDidYouWork,
   } = myForm.value;
+  const cleanPhone = phone.toString().replace(/[\s]/g, "");
   if (file.value === "") {
     alert("Error");
     return;
@@ -126,7 +133,7 @@ const sendPicture = async () => {
 
   📍Manzili: ${address}
 
-  📍Telefon: ${phone}
+  📍Telefon: ${cleanPhone}
 
   📍Tugallagan o'quv dargohlari: ${whereDidYouStudy}
 
