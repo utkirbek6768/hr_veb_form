@@ -109,7 +109,7 @@ const sendPicture = async () => {
   formData.append("photo", file.value);
   formData.append(
     "caption",
-    `	📩 Haydovchi malumotlari
+    `	📩 Yangi nomzod mavjud
 
   📍Ismi: ${myForm.fullName}
 
