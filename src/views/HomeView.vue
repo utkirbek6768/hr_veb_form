@@ -24,7 +24,13 @@
       <label for="age">Age</label>
       <input type="number" id="age" v-model="myForm.age" />
       <label for="phoneNumber">Phone number</label>
-      <input type="tel" id="phoneNumber" v-model="myForm.phoneNumber" />
+      <input
+        type="tel"
+        id="phoneNumber"
+        v-model="myForm.phoneNumber"
+        v-maska
+        data-maska="+998 ## ### ## ##"
+      />
       <label for="address">address</label>
       <textarea name="address" id="address" v-model="myForm.address"></textarea>
       <label for="whereDidYouStudy">whereDidYouStudy</label>
@@ -57,6 +63,7 @@
 <script setup>
 import axios from "axios";
 import { ref, watchEffect } from "vue";
+import { vMaska } from "maska";
 const tg = window.Telegram.WebApp;
 const BOT_TOKEN = "7050630309:AAEqP-6OzBc5Tc-b5AiY_EI3j_lpeb8SRWY";
 // const CHAT_ID = "7181292313"; // utkir 3
