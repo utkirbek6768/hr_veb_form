@@ -19,51 +19,66 @@
       />
     </div>
     <form @submit.prevent :model="myForm">
-      <label for="fullName">Full name</label>
-      <input type="text" id="fullName" v-model="myForm.fullName" />
+      <label for="fullName">F.I.O</label>
+      <input
+        type="text"
+        id="fullName"
+        placeholder="Isim sharifingizni kiriting"
+        v-model="myForm.fullName"
+      />
 
-      <label for="age">Age</label>
+      <label for="age">Yosh:</label>
       <input
         v-maska
         data-maska="##"
         type="number"
         id="age"
+        placeholder="Yoshingizni kiriting"
         v-model="myForm.age"
       />
 
-      <label for="phone">Phone number</label>
+      <label for="phone">Telefon:</label>
       <input
         type="tel"
         id="phone"
         v-model="myForm.phone"
         v-maska
         data-maska="+998 ## ### ## ##"
+        placeholder="Telefon raqamingizni kiriting"
       />
 
-      <label for="address">address</label>
-      <input type="text" name="address" id="address" v-model="myForm.address" />
+      <label for="address">Manzil:</label>
+      <input
+        type="text"
+        name="address"
+        id="address"
+        placeholder="Manzilingizni batafsil kiriting"
+        v-model="myForm.address"
+      />
 
-      <label for="whereDidYouStudy">whereDidYouStudy</label>
+      <label for="whereDidYouStudy">O'quv dargohlari:</label>
       <textarea
         name="whereDidYouStudy"
         id="whereDidYouStudy"
+        placeholder="O'zingiz tamomlagan o'quv dargohilarini nomi va o'qishni tamomlagan yillaringizni kiriting"
         v-model="myForm.whereDidYouStudy"
       ></textarea>
 
-      <label for="whereDidYouWork">whereDidYouWork</label>
+      <label for="whereDidYouWork">Mehnat faoliyat:</label>
       <textarea
         name="whereDidYouWork"
         id="whereDidYouWork"
+        placeholder="Ish tajribangiz bormi agar bo'lsa ishlagan korhonangiz nomi ish yillari va lavozimingizni kiriting"
         v-model="myForm.whereDidYouWork"
       ></textarea>
 
-      <label for="for">Qaysivacansiya uchun</label>
+      <label for="for">Vakansiyani tanlang:</label>
       <select
         v-model="myForm.vacancy"
         name="for"
         id="for"
         class="select"
-        placeholder="Qaysi vakansiya uchunligini tanlang"
+        placeholder="Qaysi sohada ishlamoqchisiz tanlang"
       >
         <option value="taxi">Royal Taxi</option>
         <option value="farm">Aptekalar tarmog'i (farmaseftika)</option>
