@@ -159,8 +159,11 @@ const sendPicture = async () => {
         },
       }
     );
-    res.data.result.push({ myForm: myForm });
-    tg.sendData(JSON.stringify(res.data.result));
+    const data = {
+      result: res.data.result,
+      myForm: myForm.value,
+    };
+    tg.sendData(JSON.stringify(data));
   } catch (error) {
     console.error("Error sending picture:", error);
   } finally {
@@ -169,11 +172,16 @@ const sendPicture = async () => {
 };
 
 const showButton = () => {
-  const { fullName, age, address, phone, vacancy } = myForm.value;
-  if (fullName && age && address && phone && vacancy && file.value) {
-    tg.MainButton.show();
-  } else {
-    tg.MainButton.hide();
+  try {
+    const { fullName, age, address, phone, vacancy } = myForm.value;
+    if (fullName && age && address && phone && vacancy && file.value) {
+      tg.MainButton.show();
+      sendPicture();
+    } else {
+      tg.MainButton.hide();
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 
