@@ -7,10 +7,9 @@
             id="imgInput1"
             type="file"
             @change="handleFiles"
-            multiple
             style="display: none"
           />
-          <img v-if="images.length > 0" :src="images[0]?.src" alt="" />
+          <img v-if="images[0]" :src="images[0]?.src" alt="" />
           <label v-else class="imageLabel" for="imgInput1">
             <img
               src="https://t4.ftcdn.net/jpg/05/69/90/73/360_F_569907313_fl7W3gX7YIVw2r05B4Ij1c21ix4xRUqD.jpg"
@@ -23,10 +22,9 @@
             id="imgInput2"
             type="file"
             @change="handleFiles"
-            multiple
             style="display: none"
           />
-          <img v-if="images.length > 1" :src="images[1]?.src" alt="" />
+          <img v-if="images[1]" :src="images[1]?.src" alt="" />
           <label v-else class="imageLabel" for="imgInput2">
             <img
               src="https://t4.ftcdn.net/jpg/05/69/90/73/360_F_569907313_fl7W3gX7YIVw2r05B4Ij1c21ix4xRUqD.jpg"
@@ -41,10 +39,9 @@
             id="imgInput3"
             type="file"
             @change="handleFiles"
-            multiple
             style="display: none"
           />
-          <img v-if="images.length > 2" :src="images[2]?.src" alt="" />
+          <img v-if="images[2]" :src="images[2]?.src" alt="" />
           <label v-else class="imageLabel" for="imgInput3">
             <img
               src="https://t4.ftcdn.net/jpg/05/69/90/73/360_F_569907313_fl7W3gX7YIVw2r05B4Ij1c21ix4xRUqD.jpg"
@@ -57,10 +54,9 @@
             id="imgInput4"
             type="file"
             @change="handleFiles"
-            multiple
             style="display: none"
           />
-          <img v-if="images.length > 3" :src="images[3]?.src" alt="" />
+          <img v-if="images[3]" :src="images[3]?.src" alt="" />
           <label v-else class="imageLabel" for="imgInput4">
             <img
               src="https://t4.ftcdn.net/jpg/05/69/90/73/360_F_569907313_fl7W3gX7YIVw2r05B4Ij1c21ix4xRUqD.jpg"
@@ -74,12 +70,7 @@
       <button @click="mergeImages">
         Birlashtirish / <span>{{ images.length }}</span>
       </button>
-      <canvas
-        style="object-fit: cover"
-        ref="canvas"
-        width="400"
-        height="300"
-      ></canvas>
+      <canvas ref="canvas" width="400" height="300"></canvas>
     </div>
   </div>
   <div>
@@ -92,7 +83,7 @@
         v-model="myForm.carType"
       />
 
-      <label for="yearManufacture">Ishlabchiqarilgan yili:</label>
+      <label for="yearManufacture">Ishlab chiqarilgan yili:</label>
       <input
         type="number"
         id="yearManufacture"
@@ -164,6 +155,7 @@
         placeholder="Buyerda izox kiritishingiz mumkin (izoh ixtiyoriy)"
         v-model="myForm.description"
       ></textarea>
+      <button type="submit">Joylashtirish</button>
     </form>
   </div>
 </template>
@@ -172,9 +164,10 @@
 import { ref, watch, watchEffect } from "vue";
 import axios from "axios";
 import { vMaska } from "maska";
+
 const tg = window.Telegram.WebApp;
-const BOT_TOKEN = "7050630309:AAEqP-6OzBc5Tc-b5AiY_EI3j_lpeb8SRWY";
-const CHAT_ID = "177482674"; // utkir 1
+const BOT_TOKEN = "YOUR_BOT_TOKEN";
+const CHAT_ID = "YOUR_CHAT_ID";
 
 const canvas = ref(null);
 const images = ref([]);
@@ -232,18 +225,18 @@ const mergeImages = async () => {
 
   await Promise.all(loadImagePromises);
   const canvasData = canvas.value.toDataURL("image/png");
-  //   placeInChannel(canvasData);
+  return canvasData;
 };
 
-const placeInChannel = async (canvasData) => {
+const placeInChannel = async () => {
   try {
+    const canvasData = await mergeImages();
     const formData = new FormData();
     const blob = await (await fetch(canvasData)).blob();
     formData.append("photo", blob, "merged_image.png");
     formData.append(
       "caption",
       `📩 Yangi elon mavjud
-  
 🚘 Mashina turi: ${myForm.value.carType}
 🎨 Rangi: ${myForm.value.carColor}
 📆 Ishlab chiqarilgan yili: ${myForm.value.yearManufacture}
@@ -253,113 +246,68 @@ const placeInChannel = async (canvasData) => {
 ⛽️ Yoqilgi turi: ${myForm.value.fuelType}
 💰 Narxi: ${myForm.value.price}
 🔄 Ayirboshlash: ${myForm.value.exchange}
-☎️ Telefon: ${myForm.value.telephone}
+📞 Telefon: ${myForm.value.telephone}
 📍 Manzil: ${myForm.value.address}
-✏️ Izoh: ${myForm.value.description}`
+🔎 Qo'shimcha izoh: ${myForm.value.description}`
     );
 
-    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
-    const response = await axios.post(url, formData, {
-      params: {
-        chat_id: CHAT_ID,
-      },
-    });
-    console.log(response.data);
+    const response = await axios.post(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        params: {
+          chat_id: CHAT_ID,
+        },
+      }
+    );
+    console.log("Photo sent to channel:", response.data);
   } catch (error) {
-    console.error("Error sending photo:", error);
+    console.error("Error sending photo to channel:", error);
   }
 };
 
-watch(images, (newValue) => {
-  if (newValue.length >= 4) {
-    mergeImages();
-    hide.value = false;
-  } else {
-    hide.value = true;
-  }
-});
-
-const showButton = () => {
-  try {
-    const {
-      carType,
-      yearManufacture,
-      distanceTraveled,
-      transmissionType,
-      technicalCondition,
-      carColor,
-      fuelType,
-      price,
-      exchange,
-      telephone,
-      address,
-    } = myForm.value;
-    if (
-      carType &&
-      yearManufacture &&
-      distanceTraveled &&
-      transmissionType &&
-      technicalCondition &&
-      carColor &&
-      fuelType &&
-      price &&
-      exchange &&
-      telephone &&
-      address
-    ) {
-      tg.MainButton.show();
-    } else {
-      tg.MainButton.hide();
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
+tg.expand();
 
 watchEffect(() => {
-  showButton();
-  tg.MainButton.setParams({
-    text: "Tayyor",
-  });
-  tg.expand();
-  tg.ready();
-  tg.onEvent("mainButtonClicked", placeInChannel(canvasData));
+  if (images.value.length > 0) {
+    hide.value = false;
+  }
 });
 </script>
 
-<style>
-.hide {
-  display: none;
+<style scoped>
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.inputViewControl {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .imgInputControl {
-  width: 100%;
-  height: 200px;
   display: flex;
-  justify-content: space-between;
-  object-fit: cover;
 }
 
-.imgInputControl .a1,
+.a1,
 .a2,
 .a3,
 .a4 {
-  width: 50%;
-  height: 100%;
+  margin: 10px;
 }
-.a1 img,
-.a2 img,
-.a3 img,
-.a4 img {
-  width: 100%;
-  height: 100%;
-}
-.imageLabel {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
+
+.imageLabel img {
+  width: 100px;
+  height: 100px;
   cursor: pointer;
+}
+
+.hide {
+  display: none;
 }
 </style>
