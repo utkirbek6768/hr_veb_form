@@ -137,6 +137,18 @@
         placeholder="Telefon raqamingizni kiriting"
       />
 
+      <label for="exchange">Ayirboshlash:</label>
+      <select
+        v-model="myForm.exchange"
+        name="exchange"
+        id="exchange"
+        class="select"
+        placeholder="Mashinani ayirboshlaysizmi (obmen)"
+      >
+        <option value="no">Yo'q</option>
+        <option value="yes">Ha</option>
+      </select>
+
       <label for="address">Manzil:</label>
       <input
         type="text"
@@ -177,7 +189,7 @@ const myForm = ref({
   carColor: "",
   fuelType: "",
   price: "",
-  exchange: "",
+  exchange: "no",
   telephone: "+998 ",
   address: "",
   description: "",
@@ -220,7 +232,7 @@ const mergeImages = async () => {
 
   await Promise.all(loadImagePromises);
   const canvasData = canvas.value.toDataURL("image/png");
-  placeInChannel(canvasData);
+  //   placeInChannel(canvasData);
 };
 
 const placeInChannel = async (canvasData) => {
@@ -232,18 +244,18 @@ const placeInChannel = async (canvasData) => {
       "caption",
       `📩 Yangi elon mavjud
   
-  🚘 Mashina turi: ${myForm.value.carType}
-  🎨 Rangi: ${myForm.value.carColor}
-  📆 Ishlab chiqarilgan yili: ${myForm.value.yearManufacture}
-  📟 Yurgan masofasi: ${myForm.value.distanceTraveled}
-  🕹 Uzatma turi: ${myForm.value.transmissionType}
-  ⚙️ Texnik holati: ${myForm.value.technicalCondition}
-  ⛽️ Yoqilgi turi: ${myForm.value.fuelType}
-  💰 Narxi: ${myForm.value.price}
-  🔄 Ayirboshlash: ${myForm.value.exchange}
-  ☎️ Telefon: ${myForm.value.telephone}
-  📍 Manzil: ${myForm.value.address}
-  📍 Izoh: ${myForm.value.description}`
+🚘 Mashina turi: ${myForm.value.carType}
+🎨 Rangi: ${myForm.value.carColor}
+📆 Ishlab chiqarilgan yili: ${myForm.value.yearManufacture}
+📟 Yurgan masofasi: ${myForm.value.distanceTraveled}
+🕹 Uzatma turi: ${myForm.value.transmissionType}
+⚙️ Texnik holati: ${myForm.value.technicalCondition}
+⛽️ Yoqilgi turi: ${myForm.value.fuelType}
+💰 Narxi: ${myForm.value.price}
+🔄 Ayirboshlash: ${myForm.value.exchange}
+☎️ Telefon: ${myForm.value.telephone}
+📍 Manzil: ${myForm.value.address}
+✏️ Izoh: ${myForm.value.description}`
     );
 
     const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
@@ -258,45 +270,85 @@ const placeInChannel = async (canvasData) => {
   }
 };
 
-watch(
-  myForm,
-  (newForm) => {
-    hide.value = !(
-      newForm.carType &&
-      newForm.yearManufacture &&
-      newForm.distanceTraveled &&
-      newForm.technicalCondition &&
-      newForm.transmissionType &&
-      newForm.telephone &&
-      newForm.address
-    );
-  },
-  { deep: true }
-);
+// watch(
+//   myForm,
+//   (newForm) => {
+//     hide.value = !(
+//       newForm.carType &&
+//       newForm.yearManufacture &&
+//       newForm.distanceTraveled &&
+//       newForm.technicalCondition &&
+//       newForm.transmissionType &&
+//       newForm.telephone &&
+//       newForm.address
+//     );
+//   },
+//   { deep: true }
+// );
+
+watch(images, (newValue) => {
+  if (newValue.length >= 4) {
+    mergeImages();
+    hide.value = false;
+  } else {
+    hide.value = true;
+  }
+});
+watch(myForm, (newForm) => {
+  const {} = newForm.value;
+  if (
+    carType &&
+    yearManufacture &&
+    distanceTraveled &&
+    transmissionType &&
+    technicalCondition &&
+    carColor &&
+    fuelType &&
+    price &&
+    exchange &&
+    telephone &&
+    address
+  ) {
+    tg.MainButton.show();
+  } else {
+    tg.MainButton.hide();
+  }
+});
 </script>
 
-<style scoped>
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+<style>
+.hide {
+  display: none;
 }
 
 .imgInputControl {
+  width: 100%;
+  height: 200px;
   display: flex;
   justify-content: space-between;
+  object-fit: cover;
 }
 
-.a1,
+.imgInputControl .a1,
 .a2,
 .a3,
 .a4 {
-  width: 100px;
-  height: 100px;
-  margin: 5px;
+  width: 50%;
+  height: 100%;
 }
-
-.hide {
-  display: none;
+.a1 img,
+.a2 img,
+.a3 img,
+.a4 img {
+  width: 100%;
+  height: 100%;
+}
+.imageLabel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
 }
 </style>
