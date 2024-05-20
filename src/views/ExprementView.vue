@@ -7,9 +7,10 @@
             id="imgInput1"
             type="file"
             @change="handleFiles"
+            multiple
             style="display: none"
           />
-          <img v-if="images[0]" :src="images[0]?.src" alt="" />
+          <img v-if="images.length > 0" :src="images[0]?.src" alt="" />
           <label v-else class="imageLabel" for="imgInput1">
             <img
               src="https://t4.ftcdn.net/jpg/05/69/90/73/360_F_569907313_fl7W3gX7YIVw2r05B4Ij1c21ix4xRUqD.jpg"
@@ -22,9 +23,10 @@
             id="imgInput2"
             type="file"
             @change="handleFiles"
+            multiple
             style="display: none"
           />
-          <img v-if="images[1]" :src="images[1]?.src" alt="" />
+          <img v-if="images.length > 1" :src="images[1]?.src" alt="" />
           <label v-else class="imageLabel" for="imgInput2">
             <img
               src="https://t4.ftcdn.net/jpg/05/69/90/73/360_F_569907313_fl7W3gX7YIVw2r05B4Ij1c21ix4xRUqD.jpg"
@@ -32,16 +34,15 @@
             />
           </label>
         </div>
-      </div>
-      <div class="imgInputControl">
         <div class="a3">
           <input
             id="imgInput3"
             type="file"
             @change="handleFiles"
+            multiple
             style="display: none"
           />
-          <img v-if="images[2]" :src="images[2]?.src" alt="" />
+          <img v-if="images.length > 2" :src="images[2]?.src" alt="" />
           <label v-else class="imageLabel" for="imgInput3">
             <img
               src="https://t4.ftcdn.net/jpg/05/69/90/73/360_F_569907313_fl7W3gX7YIVw2r05B4Ij1c21ix4xRUqD.jpg"
@@ -54,9 +55,10 @@
             id="imgInput4"
             type="file"
             @change="handleFiles"
+            multiple
             style="display: none"
           />
-          <img v-if="images[3]" :src="images[3]?.src" alt="" />
+          <img v-if="images.length > 3" :src="images[3]?.src" alt="" />
           <label v-else class="imageLabel" for="imgInput4">
             <img
               src="https://t4.ftcdn.net/jpg/05/69/90/73/360_F_569907313_fl7W3gX7YIVw2r05B4Ij1c21ix4xRUqD.jpg"
@@ -66,14 +68,18 @@
         </div>
       </div>
     </div>
+
     <div :class="{ hide: hide }">
-      <button @click="mergeImages">
+      <button style="display: none" @click="mergeImages">
         Birlashtirish / <span>{{ images.length }}</span>
       </button>
-      <canvas ref="canvas" width="400" height="300"></canvas>
+      <canvas
+        style="object-fit: cover; border-radius: 15px"
+        ref="canvas"
+        width="400"
+        height="300"
+      ></canvas>
     </div>
-  </div>
-  <div>
     <form @submit.prevent="placeInChannel">
       <label for="carType">Mashina turi</label>
       <input
@@ -82,8 +88,22 @@
         placeholder="Mashina turini kiriting"
         v-model="myForm.carType"
       />
+      <label for="carColor">Mashina rangi</label>
+      <input
+        type="text"
+        id="carColor"
+        placeholder="Mashina rangini kiriting"
+        v-model="myForm.carColor"
+      />
+      <label for="fuelType">Yoqilg'i turi</label>
+      <input
+        type="text"
+        id="fuelType"
+        placeholder="Yoqilg'i turini kiriting"
+        v-model="myForm.fuelType"
+      />
 
-      <label for="yearManufacture">Ishlab chiqarilgan yili:</label>
+      <label for="yearManufacture">Ishlabchiqarilgan yili:</label>
       <input
         type="number"
         id="yearManufacture"
@@ -140,6 +160,14 @@
         <option value="yes">Ha</option>
       </select>
 
+      <label for="price">Mashina narxi / $ da</label>
+      <input
+        type="number"
+        id="price"
+        placeholder="Mashina turini kiriting"
+        v-model="myForm.price"
+      />
+
       <label for="address">Manzil:</label>
       <input
         type="text"
@@ -155,7 +183,6 @@
         placeholder="Buyerda izox kiritishingiz mumkin (izoh ixtiyoriy)"
         v-model="myForm.description"
       ></textarea>
-      <button type="submit">Joylashtirish</button>
     </form>
   </div>
 </template>
@@ -164,14 +191,16 @@
 import { ref, watch, watchEffect } from "vue";
 import axios from "axios";
 import { vMaska } from "maska";
-
 const tg = window.Telegram.WebApp;
-const BOT_TOKEN = "YOUR_BOT_TOKEN";
-const CHAT_ID = "YOUR_CHAT_ID";
+const BOT_TOKEN = "7050630309:AAEqP-6OzBc5Tc-b5AiY_EI3j_lpeb8SRWY";
+const CHAT_ID = "177482674";
 
 const canvas = ref(null);
 const images = ref([]);
 const hide = ref(true);
+const canvasData = ref(null);
+
+const test = ref(false);
 
 const myForm = ref({
   carType: "",
@@ -224,19 +253,18 @@ const mergeImages = async () => {
   });
 
   await Promise.all(loadImagePromises);
-  const canvasData = canvas.value.toDataURL("image/png");
-  return canvasData;
+  canvasData.value = canvas.value.toDataURL("image/png");
 };
 
 const placeInChannel = async () => {
   try {
-    const canvasData = await mergeImages();
     const formData = new FormData();
     const blob = await (await fetch(canvasData)).blob();
     formData.append("photo", blob, "merged_image.png");
     formData.append(
       "caption",
       `📩 Yangi elon mavjud
+  
 🚘 Mashina turi: ${myForm.value.carType}
 🎨 Rangi: ${myForm.value.carColor}
 📆 Ishlab chiqarilgan yili: ${myForm.value.yearManufacture}
@@ -246,68 +274,116 @@ const placeInChannel = async () => {
 ⛽️ Yoqilgi turi: ${myForm.value.fuelType}
 💰 Narxi: ${myForm.value.price}
 🔄 Ayirboshlash: ${myForm.value.exchange}
-📞 Telefon: ${myForm.value.telephone}
+☎️ Telefon: ${myForm.value.telephone}
 📍 Manzil: ${myForm.value.address}
-🔎 Qo'shimcha izoh: ${myForm.value.description}`
+✏️ Izoh: ${myForm.value.description}`
     );
 
-    const response = await axios.post(
-      `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        params: {
-          chat_id: CHAT_ID,
-        },
-      }
-    );
-    console.log("Photo sent to channel:", response.data);
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
+    const response = await axios.post(url, formData, {
+      params: {
+        chat_id: CHAT_ID,
+      },
+    });
+    console.log(response.data);
   } catch (error) {
-    console.error("Error sending photo to channel:", error);
+    console.error("Error sending photo:", error);
   }
 };
 
-tg.expand();
+watch(images, (newValue) => {
+  if (newValue.length >= 4) {
+    hide.value = false;
+    mergeImages();
+  } else {
+    hide.value = true;
+  }
+});
+
+watch(
+  myForm,
+  (newMyForm) => {
+    const {
+      carType,
+      yearManufacture,
+      distanceTraveled,
+      transmissionType,
+      technicalCondition,
+      carColor,
+      fuelType,
+      price,
+      exchange,
+      telephone,
+      address,
+    } = newMyForm;
+    if (
+      carType &&
+      yearManufacture &&
+      distanceTraveled &&
+      transmissionType &&
+      technicalCondition &&
+      carColor &&
+      fuelType &&
+      price &&
+      exchange &&
+      telephone &&
+      address
+    ) {
+      test.value = true;
+      tg.MainButton.show();
+    } else {
+      test.value = false;
+      tg.MainButton.hide();
+    }
+  },
+  { deep: true }
+);
 
 watchEffect(() => {
-  if (images.value.length > 0) {
-    hide.value = false;
-  }
+  tg.MainButton.setParams({
+    text: "Tayyor",
+  });
+  tg.expand();
+  tg.ready();
+  tg.onEvent("mainButtonClicked", placeInChannel);
 });
 </script>
 
-<style scoped>
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.inputViewControl {
-  display: flex;
-  flex-wrap: wrap;
+<style>
+.hide {
+  display: none;
 }
 
 .imgInputControl {
+  width: 100%;
+  height: 100px;
   display: flex;
+  justify-content: space-between;
+  object-fit: cover;
 }
 
-.a1,
+.imgInputControl .a1,
 .a2,
 .a3,
 .a4 {
-  margin: 10px;
+  width: 25%;
+  height: 100%;
+  padding: 2px;
 }
-
-.imageLabel img {
-  width: 100px;
-  height: 100px;
+.a1 img,
+.a2 img,
+.a3 img,
+.a4 img {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+}
+.imageLabel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
   cursor: pointer;
-}
-
-.hide {
-  display: none;
 }
 </style>
