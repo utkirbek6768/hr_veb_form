@@ -169,7 +169,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, watchEffect } from "vue";
 import axios from "axios";
 import { vMaska } from "maska";
 const tg = window.Telegram.WebApp;
@@ -232,7 +232,7 @@ const mergeImages = async () => {
 
   await Promise.all(loadImagePromises);
   const canvasData = canvas.value.toDataURL("image/png");
-  placeInChannel(canvasData);
+  //   placeInChannel(canvasData);
 };
 
 const placeInChannel = async (canvasData) => {
@@ -270,22 +270,6 @@ const placeInChannel = async (canvasData) => {
   }
 };
 
-// watch(
-//   myForm,
-//   (newForm) => {
-//     hide.value = !(
-//       newForm.carType &&
-//       newForm.yearManufacture &&
-//       newForm.distanceTraveled &&
-//       newForm.technicalCondition &&
-//       newForm.transmissionType &&
-//       newForm.telephone &&
-//       newForm.address
-//     );
-//   },
-//   { deep: true }
-// );
-
 watch(images, (newValue) => {
   if (newValue.length >= 4) {
     mergeImages();
@@ -294,25 +278,52 @@ watch(images, (newValue) => {
     hide.value = true;
   }
 });
-watch(myForm, (newForm) => {
-  const {} = newForm.value;
-  if (
-    carType &&
-    yearManufacture &&
-    distanceTraveled &&
-    transmissionType &&
-    technicalCondition &&
-    carColor &&
-    fuelType &&
-    price &&
-    exchange &&
-    telephone &&
-    address
-  ) {
-    tg.MainButton.show();
-  } else {
-    tg.MainButton.hide();
+
+const showButton = () => {
+  try {
+    const {
+      carType,
+      yearManufacture,
+      distanceTraveled,
+      transmissionType,
+      technicalCondition,
+      carColor,
+      fuelType,
+      price,
+      exchange,
+      telephone,
+      address,
+    } = myForm.value;
+    if (
+      carType &&
+      yearManufacture &&
+      distanceTraveled &&
+      transmissionType &&
+      technicalCondition &&
+      carColor &&
+      fuelType &&
+      price &&
+      exchange &&
+      telephone &&
+      address
+    ) {
+      tg.MainButton.show();
+    } else {
+      tg.MainButton.hide();
+    }
+  } catch (error) {
+    console.log(error);
   }
+};
+
+watchEffect(() => {
+  showButton();
+  tg.MainButton.setParams({
+    text: "Tayyor",
+  });
+  tg.expand();
+  tg.ready();
+  tg.onEvent("mainButtonClicked", placeInChannel(canvasData));
 });
 </script>
 
