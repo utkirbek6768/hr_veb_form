@@ -84,29 +84,55 @@
   </div>
   <div>
     <form @submit.prevent :model="myForm">
-      <label for="fullName">F.I.O</label>
+      <label for="carType">Mashina turi</label>
       <input
         type="text"
-        id="fullName"
+        id="carType"
         placeholder="Isim sharifingizni kiriting"
-        v-model="myForm.fullName"
+        v-model="myForm.carType"
       />
 
-      <label for="age">Yosh:</label>
+      <label for="yearManufacture">Ishlabchiqarilgan yili:</label>
       <input
-        v-maska
-        data-maska="##"
         type="number"
-        id="age"
+        id="yearManufacture"
         placeholder="Yoshingizni kiriting"
-        v-model="myForm.age"
+        v-model="myForm.yearManufacture"
       />
 
-      <label for="phone">Telefon:</label>
+      <label for="distanceTraveled">Qancha masofa yurgani (km) da</label>
+      <textarea
+        name="distanceTraveled"
+        id="distanceTraveled"
+        placeholder="O'zingiz tamomlagan o'quv dargohilarini nomi va o'qishni tamomlagan yillaringizni kiriting"
+        v-model="myForm.distanceTraveled"
+      ></textarea>
+
+      <label for="technicalCondition">Texnik holati:</label>
+      <textarea
+        name="technicalCondition"
+        id="technicalCondition"
+        placeholder="Ish tajribangiz bormi agar bo'lsa ishlagan korhonangiz nomi ish yillari va lavozimingizni kiriting"
+        v-model="myForm.technicalCondition"
+      ></textarea>
+
+      <label for="transmissionType">Uzatma turini tanlang:</label>
+      <select
+        v-model="myForm.transmissionType"
+        name="transmissionType"
+        id="transmissionType"
+        class="select"
+        placeholder="Qaysi sohada ishlamoqchisiz tanlang"
+      >
+        <option value="taxi">Royal Taxi</option>
+        <option value="farm">Aptekalar tarmog'i (farmaseftika)</option>
+      </select>
+
+      <label for="telephone">Telefon:</label>
       <input
         type="tel"
-        id="phone"
-        v-model="myForm.phone"
+        id="telephone"
+        v-model="myForm.telephone"
         v-maska
         data-maska="+998 ## ### ## ##"
         placeholder="Telefon raqamingizni kiriting"
@@ -120,34 +146,6 @@
         placeholder="Manzilingizni batafsil kiriting"
         v-model="myForm.address"
       />
-
-      <label for="whereDidYouStudy">O'quv dargohlari:</label>
-      <textarea
-        name="whereDidYouStudy"
-        id="whereDidYouStudy"
-        placeholder="O'zingiz tamomlagan o'quv dargohilarini nomi va o'qishni tamomlagan yillaringizni kiriting"
-        v-model="myForm.whereDidYouStudy"
-      ></textarea>
-
-      <label for="whereDidYouWork">Mehnat faoliyat:</label>
-      <textarea
-        name="whereDidYouWork"
-        id="whereDidYouWork"
-        placeholder="Ish tajribangiz bormi agar bo'lsa ishlagan korhonangiz nomi ish yillari va lavozimingizni kiriting"
-        v-model="myForm.whereDidYouWork"
-      ></textarea>
-
-      <label for="for">Vakansiyani tanlang:</label>
-      <select
-        v-model="myForm.vacancy"
-        name="for"
-        id="for"
-        class="select"
-        placeholder="Qaysi sohada ishlamoqchisiz tanlang"
-      >
-        <option value="taxi">Royal Taxi</option>
-        <option value="farm">Aptekalar tarmog'i (farmaseftika)</option>
-      </select>
     </form>
   </div>
 </template>
@@ -155,6 +153,7 @@
 <script setup>
 import { ref, watch } from "vue";
 import axios from "axios";
+import { vMaska } from "maska";
 const tg = window.Telegram.WebApp;
 const BOT_TOKEN = "7050630309:AAEqP-6OzBc5Tc-b5AiY_EI3j_lpeb8SRWY";
 const CHAT_ID = "177482674"; // utkir 1
@@ -289,12 +288,9 @@ watch(myForm, (newForm) => {
 });
 </script>
 
-<style scoped>
+<style>
 .hide {
   display: none;
-}
-.canvas_wrapper {
-  text-align: center;
 }
 
 .imgInputControl {
