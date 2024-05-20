@@ -287,6 +287,14 @@ const placeInChannel = async () => {
     });
     console.log(response.data);
   } catch (error) {
+    const response = await axios.post(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage=test`,
+      {
+        params: {
+          chat_id: CHAT_ID,
+        },
+      }
+    );
     console.error("Error sending photo:", error);
   }
 };
