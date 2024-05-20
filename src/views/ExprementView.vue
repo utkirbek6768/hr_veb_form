@@ -191,9 +191,10 @@
 import { ref, watch, watchEffect } from "vue";
 import axios from "axios";
 import { vMaska } from "maska";
+
 const tg = window.Telegram.WebApp;
-const BOT_TOKEN = "7050630309:AAEqP-6OzBc5Tc-b5AiY_EI3j_lpeb8SRWY";
-const CHAT_ID = "177482674";
+const BOT_TOKEN = "YOUR_BOT_TOKEN";
+const CHAT_ID = "YOUR_CHAT_ID";
 
 const canvas = ref(null);
 const images = ref([]);
@@ -259,24 +260,11 @@ const mergeImages = async () => {
 const placeInChannel = async () => {
   try {
     const formData = new FormData();
-    const blob = await (await fetch(canvasData)).blob();
+    const blob = await (await fetch(canvasData.value)).blob();
     formData.append("photo", blob, "merged_image.png");
     formData.append(
       "caption",
-      `📩 Yangi elon mavjud
-  
-🚘 Mashina turi: ${myForm.value.carType}
-🎨 Rangi: ${myForm.value.carColor}
-📆 Ishlab chiqarilgan yili: ${myForm.value.yearManufacture}
-📟 Yurgan masofasi: ${myForm.value.distanceTraveled}
-🕹 Uzatma turi: ${myForm.value.transmissionType}
-⚙️ Texnik holati: ${myForm.value.technicalCondition}
-⛽️ Yoqilgi turi: ${myForm.value.fuelType}
-💰 Narxi: ${myForm.value.price}
-🔄 Ayirboshlash: ${myForm.value.exchange}
-☎️ Telefon: ${myForm.value.telephone}
-📍 Manzil: ${myForm.value.address}
-✏️ Izoh: ${myForm.value.description}`
+      `📩 Yangi elon mavjud\n\n🚘 Mashina turi: ${myForm.value.carType}\n🎨 Rangi: ${myForm.value.carColor}\n📆 Ishlab chiqarilgan yili: ${myForm.value.yearManufacture}\n📟 Yurgan masofasi: ${myForm.value.distanceTraveled}\n🕹 Uzatma turi: ${myForm.value.transmissionType}\n⚙️ Texnik holati: ${myForm.value.technicalCondition}\n⛽️ Yoqilgi turi: ${myForm.value.fuelType}\n💰 Narxi: ${myForm.value.price}\n🔄 Ayirboshlash: ${myForm.value.exchange}\n☎️ Telefon: ${myForm.value.telephone}\n📍 Manzil: ${myForm.value.address}\n✏️ Izoh: ${myForm.value.description}`
     );
 
     const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
@@ -287,14 +275,6 @@ const placeInChannel = async () => {
     });
     console.log(response.data);
   } catch (error) {
-    const response = await axios.post(
-      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage=test`,
-      {
-        params: {
-          chat_id: CHAT_ID,
-        },
-      }
-    );
     console.error("Error sending photo:", error);
   }
 };
@@ -359,6 +339,7 @@ watchEffect(() => {
 .hide {
   display: none;
 }
+
 .canvas-wrapper {
   width: 100%;
   height: 300px;
@@ -367,7 +348,7 @@ watchEffect(() => {
   overflow: hidden; /* Ensure rounded corners are effective */
 }
 
-canvas {
+.canvas {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -379,7 +360,6 @@ canvas {
   height: 100px;
   display: flex;
   justify-content: space-between;
-  object-fit: cover;
 }
 
 .imgInputControl .a1,
@@ -390,20 +370,35 @@ canvas {
   height: 100%;
   padding: 2px;
 }
+
 .a1 img,
 .a2 img,
 .a3 img,
 .a4 img {
   width: 100%;
   height: 100%;
-  border-radius: 5px;
+  object-fit: cover;
+  border-radius: 10px; /* Optional: Add rounded corners to images */
 }
-.imageLabel {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+
+.imageLabel img {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+}
+
+.imageLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  background-color: #f0f0f0;
+  border: 2px dashed #ccc;
+  border-radius: 10px; /* Add rounded corners to the label */
+  transition: background-color 0.3s;
+}
+
+.imageLabel:hover {
+  background-color: #e0e0e0;
 }
 </style>
