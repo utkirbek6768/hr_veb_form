@@ -71,7 +71,7 @@
       </div>
     </div>
     <div :class="{ hide: hide }">
-      <button @click="mergeImages" style="display: none">
+      <button @click="mergeImages">
         Birlashtirish / <span>{{ images.length }}</span>
       </button>
       <canvas
@@ -83,12 +83,12 @@
     </div>
   </div>
   <div>
-    <form @submit.prevent :model="myForm">
+    <form @submit.prevent="placeInChannel">
       <label for="carType">Mashina turi</label>
       <input
         type="text"
         id="carType"
-        placeholder="Isim sharifingizni kiriting"
+        placeholder="Mashina turini kiriting"
         v-model="myForm.carType"
       />
 
@@ -96,23 +96,22 @@
       <input
         type="number"
         id="yearManufacture"
-        placeholder="Yoshingizni kiriting"
+        placeholder="Ishlab chiqarilgan yilini kiriting"
         v-model="myForm.yearManufacture"
       />
-
-      <label for="distanceTraveled">Qancha masofa yurgani (km) da</label>
-      <textarea
-        name="distanceTraveled"
+      <label for="distanceTraveled">Qancha masofa yurgani (km) da:</label>
+      <input
+        type="number"
         id="distanceTraveled"
-        placeholder="O'zingiz tamomlagan o'quv dargohilarini nomi va o'qishni tamomlagan yillaringizni kiriting"
+        placeholder="Qancha masofa yurganini kiriting"
         v-model="myForm.distanceTraveled"
-      ></textarea>
+      />
 
       <label for="technicalCondition">Texnik holati:</label>
       <textarea
         name="technicalCondition"
         id="technicalCondition"
-        placeholder="Ish tajribangiz bormi agar bo'lsa ishlagan korhonangiz nomi ish yillari va lavozimingizni kiriting"
+        placeholder="Texnik holati haqida batafsil yozin (bo'yoq necha foiz yoki toza)"
         v-model="myForm.technicalCondition"
       ></textarea>
 
@@ -122,10 +121,10 @@
         name="transmissionType"
         id="transmissionType"
         class="select"
-        placeholder="Qaysi sohada ishlamoqchisiz tanlang"
+        placeholder="Mashinani uzatma turini tanlang"
       >
-        <option value="taxi">Royal Taxi</option>
-        <option value="farm">Aptekalar tarmog'i (farmaseftika)</option>
+        <option value="mechanic">Mexanik uzatma</option>
+        <option value="automatic">Avtomatik uzatma</option>
       </select>
 
       <label for="telephone">Telefon:</label>
@@ -146,6 +145,13 @@
         placeholder="Manzilingizni batafsil kiriting"
         v-model="myForm.address"
       />
+      <label for="description">Qo'shimcha izoh:</label>
+      <textarea
+        name="description"
+        id="description"
+        placeholder="Buyerda izox kiritishingiz mumkin (izoh ixtiyoriy)"
+        v-model="myForm.description"
+      ></textarea>
     </form>
   </div>
 </template>
@@ -172,8 +178,9 @@ const myForm = ref({
   fuelType: "",
   price: "",
   exchange: "",
-  telephone: "",
+  telephone: "+998 ",
   address: "",
+  description: "",
 });
 
 const handleFiles = (event) => {
@@ -212,115 +219,84 @@ const mergeImages = async () => {
   });
 
   await Promise.all(loadImagePromises);
+  const canvasData = canvas.value.toDataURL("image/png");
+  placeInChannel(canvasData);
 };
 
-const placeInChannel = (canvasData) => {
+const placeInChannel = async (canvasData) => {
   try {
-    canvasData.value.toBlob(async (blob) => {
-      const formData = new FormData();
-      formData.append("photo", blob, "merged_image.png");
-      formData.append(
-        "caption",
-        `📩 Yangi elon mavjud
+    const formData = new FormData();
+    const blob = await (await fetch(canvasData)).blob();
+    formData.append("photo", blob, "merged_image.png");
+    formData.append(
+      "caption",
+      `📩 Yangi elon mavjud
+  
+  🚘 Mashina turi: ${myForm.value.carType}
+  🎨 Rangi: ${myForm.value.carColor}
+  📆 Ishlab chiqarilgan yili: ${myForm.value.yearManufacture}
+  📟 Yurgan masofasi: ${myForm.value.distanceTraveled}
+  🕹 Uzatma turi: ${myForm.value.transmissionType}
+  ⚙️ Texnik holati: ${myForm.value.technicalCondition}
+  ⛽️ Yoqilgi turi: ${myForm.value.fuelType}
+  💰 Narxi: ${myForm.value.price}
+  🔄 Ayirboshlash: ${myForm.value.exchange}
+  ☎️ Telefon: ${myForm.value.telephone}
+  📍 Manzil: ${myForm.value.address}
+  📍 Izoh: ${myForm.value.description}`
+    );
 
-🚘 Mashina turi: ${carType}
-🎨 Rangi: ${carColor}
-📆 Ishlab chiqarilgan yili: ${yearManufacture}
-📟 Yurgan masofasi: ${distanceTraveled}
-🕹 Uzatma turi: ${transmissionType}
-🛠 Texnik holati (kraskasi): ${technicalCondition}
-⛽️ Yoqilg'i turi: ${fuelType}
-
-💰 Narxi: ${price}
-
-♻️ Almashish kelishuvi: ${exchange}
-📞 Telefon: ${telephone}
-🏡 Manzil: ${Address}
-  `
-      );
-
-      try {
-        const res = await axios.post(
-          `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto?chat_id=${CHAT_ID}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        console.log("Photo sent successfully:", res.data);
-      } catch (error) {
-        console.error("Error sending picture:", error);
-      }
-    }, "image/png");
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
+    const response = await axios.post(url, formData, {
+      params: {
+        chat_id: CHAT_ID,
+      },
+    });
+    console.log(response.data);
   } catch (error) {
-    console.log(error);
+    console.error("Error sending photo:", error);
   }
 };
-watch(images, (newValue) => {
-  if (newValue.length >= 4) {
-    mergeImages();
-    hide.value = false;
-  } else {
-    hide.value = true;
-  }
-});
-watch(myForm, (newForm) => {
-  const {} = newForm.value;
-  if (
-    carType &&
-    yearManufacture &&
-    distanceTraveled &&
-    transmissionType &&
-    technicalCondition &&
-    carColor &&
-    fuelType &&
-    price &&
-    exchange &&
-    telephone &&
-    address
-  ) {
-    tg.MainButton.show();
-  } else {
-    tg.MainButton.hide();
-  }
-});
+
+watch(
+  myForm,
+  (newForm) => {
+    hide.value = !(
+      newForm.carType &&
+      newForm.yearManufacture &&
+      newForm.distanceTraveled &&
+      newForm.technicalCondition &&
+      newForm.transmissionType &&
+      newForm.telephone &&
+      newForm.address
+    );
+  },
+  { deep: true }
+);
 </script>
 
-<style>
-.hide {
-  display: none;
+<style scoped>
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .imgInputControl {
-  width: 100%;
-  height: 200px;
   display: flex;
   justify-content: space-between;
-  object-fit: cover;
 }
 
-.imgInputControl .a1,
+.a1,
 .a2,
 .a3,
 .a4 {
-  width: 50%;
-  height: 100%;
+  width: 100px;
+  height: 100px;
+  margin: 5px;
 }
-.a1 img,
-.a2 img,
-.a3 img,
-.a4 img {
-  width: 100%;
-  height: 100%;
-}
-.imageLabel {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
+
+.hide {
+  display: none;
 }
 </style>
