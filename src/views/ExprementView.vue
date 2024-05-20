@@ -184,6 +184,7 @@
         v-model="myForm.description"
       ></textarea>
     </form>
+    <button v-if="test" @click="placeInChannel">send</button>
   </div>
 </template>
 
@@ -317,8 +318,10 @@ watch(
       telephone &&
       address
     ) {
+      test.value = true;
       tg.MainButton.show();
     } else {
+      test.value = false;
       tg.MainButton.hide();
     }
   },
