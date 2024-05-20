@@ -76,7 +76,7 @@
       <canvas
         style="object-fit: cover; border-radius: 15px"
         ref="canvas"
-        width="400"
+        width="425"
         height="300"
       ></canvas>
     </div>
@@ -337,10 +337,8 @@ watch(
       telephone &&
       address
     ) {
-      test.value = true;
       tg.MainButton.show();
     } else {
-      test.value = false;
       tg.MainButton.hide();
     }
   },
@@ -360,6 +358,20 @@ watchEffect(() => {
 <style>
 .hide {
   display: none;
+}
+.canvas-wrapper {
+  width: 100%;
+  height: 300px;
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden; /* Ensure rounded corners are effective */
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .imgInputControl {
