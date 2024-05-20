@@ -232,7 +232,7 @@ const mergeImages = async () => {
 
   await Promise.all(loadImagePromises);
   const canvasData = canvas.value.toDataURL("image/png");
-  //   placeInChannel(canvasData);
+  placeInChannel(canvasData);
 };
 
 const placeInChannel = async (canvasData) => {
